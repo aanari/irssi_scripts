@@ -263,7 +263,7 @@ sub calc_text {
 	my $tmp = $nicklist_width-3;
 	(my $text = $nick->{nick}) =~ s/^(.{$tmp})..+$/$1\033[34m~\033[m/;
     my $color = $saved_colors->{$nick->{nick}};
-    my $color_map = {
+    my $fg_map = {
         r => '0;31',
         R => '1;31',
         g => '0;32',
@@ -280,9 +280,12 @@ sub calc_text {
         C => '1;36',
         w => '0;37',
         W => '1;37',
+        U => '4;39',
     };
-    $color =~ s/%([a-zA-Z])/\e[@{[$color_map->{$1}]}m/;
-    $text = $color . $prefix_mode[$nick->{'mode'}] . "$text\e[39m";
+    $color =~ s/%([a-zA-Z])/\e[@{[$fg_map->{$1}]}m/;
+    $color =~ s/%([1-7])/\e[@{[40+$1]}m/;
+    $color =~ s/%([8-9])//;
+    $text = $color . $prefix_mode[$nick->{mode}] . "$text\e[39m";
 	$nick->{'text'} = $text . (' ' x ($nicklist_width-length($nick->{'nick'})-1));
 	$nick->{'cmp'} = $nick->{'mode'}.lc($nick->{'nick'});
 }
